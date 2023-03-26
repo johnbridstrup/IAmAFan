@@ -6,7 +6,7 @@ baud = 38400
 port = 5000
 host = 'localhost'
 
+FoIP = NetworkController(host, port)
+fan = Fan(FoIP, dev_port, baud)
 
-fan = Fan(dev_port, baud)
-term = NetworkController(fan, host, port)
-term.start()
+fan.start()
