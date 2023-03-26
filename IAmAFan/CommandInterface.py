@@ -1,22 +1,21 @@
-# Interface for controlling fans
-import serial
+from IAmAFan.Fan import Fan
 
 class CantDoThatError(Exception):
     pass
 
-def _is_8_bit(num: int):
-    if num > 255:
-        raise CantDoThatError(f"Int is too big for 8 bits: {num}")
-    elif num < 0:
-        raise CantDoThatError(f"Int is less than 0: {num}")
-    return num
-
 
 class CommandInterface:
-    def __init__(self, fan: serial.Serial):
+    def __init__(self, fan: Fan):
         self.fan = fan
+
+    def check_speed(self, num):
+        if num > self.fan.max_speed:
+            raise CantDoThatError(f"{num} is greater than max speed ({self.fan.max_speed})")
+        elif num < self.fan.min_speed:
+            raise CantDoThatError(f"Int is less than min speed ({self.fan.min_speed})")
     
-    def set_fan_speed(self, speed: _is_8_bit):
+    def set_fan_speed(self, speed: int):
+        self.check_speed(speed)
         print(f"setting speed to {speed}")
         self.fan.write(str(speed).encode())
 
@@ -24,11 +23,14 @@ class CommandInterface:
         raise NotImplementedError("OVERRIDE ME")
 
     def _loop(self):
-        print("Waiting to set the fan speed")
+        print("Controlling the fan.")
         try:
             while True:
                 speed = self.get_fan_speed()
-                self.set_fan_speed(speed)
+                try:
+                    self.set_fan_speed(speed)
+                except CantDoThatError as e:
+                    print(e)
         except KeyboardInterrupt:
             pass
     
