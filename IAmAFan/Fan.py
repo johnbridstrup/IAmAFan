@@ -20,7 +20,8 @@ class Fan(serial.Serial):
         exclusive=None, 
         **kwargs
     ):
-    
+
         super().__init__(port, baudrate, bytesize, parity, stopbits, timeout, xonxoff, rtscts, write_timeout, dsrdtr, inter_byte_timeout, exclusive, **kwargs)
         self.max_speed = max_speed
         self.min_speed = min_speed
+        self.cur_speed = 0
